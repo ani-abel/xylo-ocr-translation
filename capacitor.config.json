@@ -1,0 +1,6 @@
+{
+	"appId": "com.xylo.app",
+	"appName": "xylo",
+	"webDir": "www",
+	"bundledWebRuntime": false
+}
