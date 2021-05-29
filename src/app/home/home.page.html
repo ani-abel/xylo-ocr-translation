@@ -1,20 +1,163 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      Blank
-    </ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+  <div class="modal-section" 
+    [ngClass]="{ 'hidden-visually': captureProgress === 0 || captureProgress === 100 }">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-header-widget">
+                <h4 class="text-white">
+                    <span *ngIf="captureProgress < 25; else defaultText">
+                        Initializing...
+                    </span>
+                    <ng-template #defaultText>
+                        <span>
+                            Capturing text...
+                        </span>
+                    </ng-template>
+                </h4>
+            </div>
+            <!-- <div class="modal-header-widget text-right">
+                <button class="nav-cancel-button btn-no-border cursor-pointer close-modal">
+                    <svg xmlns:xlink="http://www.w3.org/1999/xlink" class="svg-close" height="48px" version="1.1" viewBox="0 0 47 48" width="47px" xmlns="http://www.w3.org/2000/svg">
+                        <defs></defs>
+                        <g fill="none" fill-rule="evenodd" id="Page-1" stroke="none" stroke-width="1">
+                        <g fill="#fff" id="Search---Default" transform="translate(-1313.000000, -80.000000)">
+                            <g id="Modal">
+                            <g id="Close-icon" transform="translate(1313.000000, 80.000000)">
+                                <path d="M23.6666667,22.5857864 L1.74635645,0.665476221 L0.332142888,2.07968978 L22.2524531,24 L0.332142888,45.9203102 L1.74635645,47.3345238 L23.6666667,25.4142136 L45.5869769,47.3345238 L47.0011904,45.9203102 L25.0808802,24 L47.0011904,2.07968978 L45.5869769,0.665476221 L23.6666667,22.5857864 Z" id="close-icon"></path>
+                            </g>
+                            </g>
+                        </g>
+                        </g>
+                    </svg>
+            </button>
+            </div> -->
+        </div>
+        <div class="modal-content">
+            <div class="progress-bar-section">
+                <div class="progress-bar">
+                    <div [style.width]="captureProgress +'%'" class="progress-bar-inner"></div>
+                </div>
+                <p class="no-margin">
+                    {{ captureProgress }}%
+                </p>
+            </div>
+        </div>
+    </div>    
   </div>
+
+  <div class="modal-section hidden-visually" [ngClass]="{ 'hidden-visually': !isModalOpen }">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-header-widget">
+                <h4 class="text-white hidden-sm-down">Translate Content</h4>
+            </div>
+            <div class="modal-header-widget text-right">
+                <button (click)="toggleModal()" class="nav-cancel-button btn-no-border cursor-pointer close-modal">
+                    <svg xmlns:xlink="http://www.w3.org/1999/xlink" class="svg-close" height="48px" version="1.1" viewBox="0 0 47 48" width="47px" xmlns="http://www.w3.org/2000/svg">
+                        <defs></defs>
+                        <g fill="none" fill-rule="evenodd" id="Page-1" stroke="none" stroke-width="1">
+                        <g fill="#fff" id="Search---Default" transform="translate(-1313.000000, -80.000000)">
+                            <g id="Modal">
+                            <g id="Close-icon" transform="translate(1313.000000, 80.000000)">
+                                <path d="M23.6666667,22.5857864 L1.74635645,0.665476221 L0.332142888,2.07968978 L22.2524531,24 L0.332142888,45.9203102 L1.74635645,47.3345238 L23.6666667,25.4142136 L45.5869769,47.3345238 L47.0011904,45.9203102 L25.0808802,24 L47.0011904,2.07968978 L45.5869769,0.665476221 L23.6666667,22.5857864 Z" id="close-icon"></path>
+                            </g>
+                            </g>
+                        </g>
+                        </g>
+                    </svg>
+            </button>
+            </div>
+        </div>
+
+        <div class="modal-content">
+            <form class="form-inline no-padding">
+                <div class="form-group">
+                    <label for="call-link" class="text-bold">From*</label>
+                    <select class="form-control" disabled>
+                        <option [value]="language.Code" *ngFor="let language of getSupportedLanguages()">
+                            {{ language.Language }}
+                        </option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="call-link" class="text-bold">To*</label>
+                    <select #select (change)="translate(select.value)" class="form-control">
+                        <option [value]="language.Code" 
+                            *ngFor="let language of getSupportedLanguages()">
+                            {{ language.Language }}
+                        </option>
+                    </select>
+                </div>
+            </form>
+            <div *ngIf="translatedText">
+                <p #translatedTextDisplayEl>
+                    {{ translatedText }}
+                </p>
+                <p class="text-center">
+                    <button class="btn btn-primary text-white"
+                     (click)="copyTranslationToClipBoard(translatedTextDisplayEl)">
+                        Copy Translation
+                    </button>
+                </p>
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <main>
+    <h1 class="text-center">XYLO</h1>
+    <p class="text-center caption">
+        Select photo from
+    </p>
+    <section class="page-content">
+        <div class="button-container">
+            <button (click)="captureImage(cameraSource.Photos)" 
+                class="btn btn-primary btn-block text-decoration-none text-white">
+                Photo Gallary
+            </button>
+        </div>
+        <div class="button-container">
+            <button (click)="captureImage(cameraSource.Camera)" 
+                class="btn btn-danger btn-block text-decoration-none text-white">
+                Take Photo
+            </button>
+        </div>
+    </section>
+
+    <ng-container *ngIf="imageUrl">
+        <div class="selected-image-section">
+            <img [src]="imageUrl" [alt]="'Selected Image'" />
+        </div>
+    </ng-container>
+
+    <ng-container *ngIf="workerReady && captureProgress > 0">
+        <div [ngClass]="{ 'pt-30': !imageUrl }" 
+            class="generated-content-section">
+            <form>
+                <div class="form-group">
+                    <textarea 
+                        [innerText]="ocrResult"
+                        class="form-textarea no-resize copy-textarea"
+                        #textEl></textarea>
+                </div>
+                <div class="button-control-section">
+                    <button type="button" class="btn btn-primary text-white open-modal" (click)="toggleModal()">
+                        Translate
+                    </button>
+
+                    <button type="button" 
+                        class="btn btn-primary text-white copy-btn" 
+                        (click)="copyToClipBoard(textEl)">
+                        Copy Text
+                    </button>
+
+                    <button (click)="resetTemplate()" 
+                        type="button" class="btn btn-danger text-white">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </ng-container>
+  </main>
 </ion-content>
